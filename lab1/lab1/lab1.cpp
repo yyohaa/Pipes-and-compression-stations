@@ -23,8 +23,6 @@ struct CS {
 };
 
 
-
-
 int main()
 {
 
@@ -33,22 +31,40 @@ int main()
 
     bool statePipe = false;
     bool stateCS = false;
+    
+    int mem;
+    std::cout << "Hello, user<3! please, choose: " << endl;
+    std::cout << "1. Add a pipe" << endl;
+    std::cout << "2. Add a compression station (CS)" << endl;
+    std::cout << "3. View all" << endl;
+    std::cout << "4. Edit: pipe" << endl;
+    std::cout << "5. Edit: compression station" << endl;
+    std::cout << "6. Save changes" << endl;
+    std::cout << "7. Upload (file)" << endl;
+    std::cout << "0. Exit" << endl;
+    
+    cin >> mem;
 
-    while (true) {
-        std::cout << "Hello, user <3! please, choose: \n";
-        std::cout << "1. Add a pipe\n";
-        std::cout << "2. Add a compression station (CS)\n";
-        std::cout << "3. View all\n";
-        std::cout << "4. Edit: pipe\n";
-        std::cout << "5. Edit: compression station\n";
-        std::cout << "6. Save changes\n";
-        std::cout << "7. Upload (file)\n";
-        std::cout << "0. Exit\n";
-
+    switch (mem) {
+    case 0:
+        std::cout << "Hello, user<3! please, choose: \n" << endl;
+    case 1: 
+        std::cout << "1. Add a pipe\n" << endl;
+    case 2:
+        std::cout << "2. Add a compression station (CS)\n" << endl;
+    case 3:
+        std::cout << "3. View all\n" << endl;
+    case 4: 
+        std::cout << "4. Edit: pipe\n" << endl;
+    case 5:
+        std::cout << "5. Edit: compression station\n" << endl;
+    case 6:
+        std::cout << "6. Save changes\n" << endl;
+    case 7:
+        std::cout << "7. Upload (file)\n" << endl;
+    case 8: 
+        std::cout << "0. Exit\n" << endl;
     }
-
-    int choice;
-    cin >> choice;
 
     if (cin.fail()) {
         cin.clear();
@@ -56,30 +72,7 @@ int main()
         cout << "wrong!( try again with a number..\n" << endl;
     }
 
-    if (choice == 1) {
-        cout << "\nADD PIPE\n";
-        cout << "Enter start point (km): ";
-        cin >> pipe.name;
-        cout << "Enter length (km): ";
-        cin >> pipe.len;
-        cout << "Enter diameter (mm): ";
-        cin >> pipe.d;
-        pipe.statePipe = false;
-        statePipe = true;
-        cout << "Pipe added!\n";
-    }
-    else if (choice == 2) {
-        cout << "\nADD CS\n";
-        cout << "Enter station name: ";
-        cin >> compStation.name;
-        cout << "Enter total workshops: ";
-        cin >> compStation.squant;
-        cout << "Enter class (A, B or C): ";
-        cin >> compStation.type;
-        compStation.wsquant = compStation.squant;
-        stateCS = true;
-        cout << "CS added!\n";
-    }
+    
 
 }
 
