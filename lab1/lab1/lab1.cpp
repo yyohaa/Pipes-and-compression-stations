@@ -2,7 +2,6 @@
 //
 
 #include <iostream>
-#include <conio.h>
 #include <string>
 #include <fstream>
 
@@ -183,11 +182,7 @@ int main()
         std::cout << "7. Upload (file)" << endl;
         std::cout << "0. Exit" << endl;
         cin >> mem;
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(100000, '\n');
-            cout << "wrong!( try again with a number..\n" << endl;
-        }
+        
         switch (mem) {
         case 1:
             addPipe(pipe);
@@ -212,19 +207,17 @@ int main()
             Load(pipe, compStation);
             break;
         case 0:
-            _getch();
             return 0;
             break;
         default:
             std::cout << "sorry((( wrong choice(((\n" << endl;
-            _getch();
             break;
         }
     }
+    if (cin.fail()) {
+        cin.clear();
+        cin.ignore(100000, '\n');
+        cout << "wrong!( try again with a number..\n" << endl;
+
+    }
 }
-
-    
-
-
-
-
