@@ -27,18 +27,18 @@ struct CS {
 
 
 void addPipe(Pipe& pipe){
-    cout << "add a pipe";
+    cout << "add a pipe\n";
     cout << "enter a name: ";
     cin >> pipe.name;
     cout << "enter lenght(km): ";
     cin >> pipe.len;
     cout << "enter diameter (mm): ";
     cin >> pipe.d;
-    cout << "is a pipe under repair(construction)(1-yes, 0-no): ";
+    cout << "is a pipe under repair(construction)(1-yes, 0-no): \n";
     cin >> pipe.statePipe;
     }
 void addCS(CS& cs) {
-    cout << "add a compression station";
+    cout << "add a compression station\n";
     cout << "enter a name: ";
     cin >> cs.name;
     cout << "enter total: ";
@@ -47,7 +47,7 @@ void addCS(CS& cs) {
     cin >> cs.wsquant;
     cout << "enter class: ";
     cin >> cs.type;
-    cout << "is a CS working(1-yes, 0-no): ";
+    cout << "is a CS working(1-yes, 0-no): \n";
     cin >> cs.stateCS;
 }
 void viewPipe(Pipe & pipe) {
@@ -70,7 +70,7 @@ void viewCS(CS& cs) {
         cout << "\ncompression station has not been added\n";
         return;
     }
-    cout << "\npipe\n";
+    cout << "\nCS\n";
     cout << "name: " << cs.name << endl;
     cout << "total stations: " << cs.squant << endl;
     cout << "total working stations: " << cs.wsquant << endl;
@@ -142,12 +142,12 @@ void Save(Pipe& pipe, CS& cs) {
     file << cs.stateCS << endl;
 
     file.close();
-    cout << "data was saved";
+    cout << "\ndata was saved\n";
 }
 void Load(Pipe& pipe, CS& cs) {
     ifstream file("labaodin.txt");
     if (!file) {
-        cout << "file not found";
+        cout << "\nfile not found\n";
         return;
     }
     file >> pipe.name;
@@ -161,7 +161,7 @@ void Load(Pipe& pipe, CS& cs) {
     file >> cs.stateCS;
 
     file.close();
-    cout << "data was loaded";
+    cout << "\ndata was loaded\n";
 }
 
 int main()
@@ -169,9 +169,6 @@ int main()
 
     Pipe pipe;
     CS compStation;
-
-    bool statePipe = false;
-    bool stateCS = false;
     
     int mem;
 
@@ -186,7 +183,11 @@ int main()
         std::cout << "7. Upload (file)" << endl;
         std::cout << "0. Exit" << endl;
         cin >> mem;
-
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(100000, '\n');
+            cout << "wrong!( try again with a number..\n" << endl;
+        }
         switch (mem) {
         case 1:
             addPipe(pipe);
@@ -211,25 +212,15 @@ int main()
             Load(pipe, compStation);
             break;
         case 0:
-            _getch;
+            _getch();
             return 0;
             break;
         default:
             std::cout << "sorry((( wrong choice(((\n" << endl;
-            _getch;
+            _getch();
             break;
         }
     }
-    
-
-    if (cin.fail()) {
-        cin.clear();
-        cin.ignore(100000, '\n');
-        cout << "wrong!( try again with a number..\n" << endl;
-    }
-
-    
-
 }
 
     
