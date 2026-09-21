@@ -35,7 +35,7 @@ void addPipe(Pipe& pipe){
     cout << "is a pipe under construction (1-yes, 0-no): \n";
     cin >> pipe.statePipe;
     }
-void addCS(CS cs) {
+void addCS(CS& cs) {
     cout << "add a compression station\n";
     cout << "enter a name: ";
     cin >> cs.name;
@@ -46,7 +46,7 @@ void addCS(CS cs) {
     cout << "enter class: ";
     cin >> cs.type;
 }
-void viewPipe(Pipe pipe) {
+void viewPipe(const Pipe& pipe) {
     if (pipe.name == "") {
         cout << "\npipe has not been added\n";
         return;
@@ -61,7 +61,7 @@ void viewPipe(Pipe pipe) {
     else
         cout << "under repair - no\n";
 }
-void viewCS(CS& cs) {
+void viewCS(const CS& cs) {
     if (cs.name == "") {
         cout << "\nworkshop has not been added\n";
         return;
@@ -87,8 +87,8 @@ void editCS(CS& cs) {
         return;
     }
     int act;
-    cout << "\n1.start station\n";
-    cout << "\n2.stop station\n";
+    cout << "\n1.start workshop\n";
+    cout << "\n2.stop workshop\n";
     cout << "\nplease, choose: \n";
     cin >> act;
     if (act == 1) {
@@ -175,15 +175,15 @@ int main()
     
     int mem;
     for (;;) {
-        std::cout << "\n\nHello, user<3! please, choose: " << endl;
-        std::cout << "1. Add a pipe" << endl;
-        std::cout << "2. Add a compression station (CS)" << endl;
-        std::cout << "3. View all" << endl;
-        std::cout << "4. Edit: pipe" << endl;
-        std::cout << "5. Edit: compression station" << endl;
-        std::cout << "6. Save changes" << endl;
-        std::cout << "7. Upload (file)" << endl;
-        std::cout << "0. Exit" << endl;
+        cout << "\n\nHello, user<3! please, choose: " << endl;
+        cout << "1. Add a pipe" << endl;
+        cout << "2. Add a compression station (CS)" << endl;
+        cout << "3. View all" << endl;
+        cout << "4. Edit: pipe" << endl;
+        cout << "5. Edit: compression station" << endl;
+        cout << "6. Save changes" << endl;
+        cout << "7. Upload (file)" << endl;
+        cout << "0. Exit" << endl;
         cin >> mem;
         
         switch (mem) {
