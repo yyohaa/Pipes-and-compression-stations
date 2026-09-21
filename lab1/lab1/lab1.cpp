@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -23,28 +24,91 @@ struct CS {
     char type;
 };
 
+int inputInt(string text, int min, int max) {
+    while (true) {
+        cout << text;
+        string line;
+        getline(cin, line);
+
+        stringstream ss(line);
+        int val;
+
+        if (ss >> val) {
+            ss >> ws;
+            if (ss.eof() && val >= min && val <= max) {
+                return val;
+            }
+        }
+        cout << "wrong input, try again :)\n";
+    }
+}
+int plusInt(string text) {
+    while (true) {
+        cout << text;
+        string line;
+        getline(cin, line);
+
+        stringstream ss(line);
+        int val;
+
+        if (ss >> val) {
+            ss >> ws;
+            if (ss.eof() && val >0) {
+                return val;
+            }
+        }
+        cout << "wrong input, try again with a positive number :)\n";
+    }
+
+}
+double plusDouble(string text) {
+    while (true) {
+        cout << text;
+        string line;
+        getline(cin, line);
+
+        stringstream ss(line);
+        double val;
+
+        if (ss >> val) {
+            ss >> ws;
+            if (ss.eof() && val > 0) {
+                return val;
+            }
+        }
+        cout << "wrong input, try again with a positive number :)\n";
+    }
+}
+string inputString(string text) {
+    while (true) {
+        cout << text;
+        string val;
+        getline(cin, val);
+
+        if (!val.empty() && val.find_first_not_of(" \t") != string::npos) {
+            return val;
+        }
+        cout << "wrong input, try again, name cannot be empty :)\n";
+    }
+}
 
 void addPipe(Pipe& pipe){
     cout << "add a pipe\n";
-    cout << "enter a name: ";
-    cin >> pipe.name;
-    cout << "enter lenght(km): ";
-    cin >> pipe.len;
-    cout << "enter diameter (mm): ";
-    cin >> pipe.d;
-    cout << "is a pipe under construction (1-yes, 0-no): \n";
-    cin >> pipe.statePipe;
+    pipe.name = inputString("enter name: ");
+    pipe.len = plusDouble("enter lenght(km): ");
+    pipe.d = plusInt("enter diameter (mm): ");
+    pipe.statePipe = inputInt("is a pipe under construction (1-yes, 0-no): \n", 0, 1);
     }
 void addCS(CS& cs) {
     cout << "add a compression station\n";
-    cout << "enter a name: ";
-    cin >> cs.name;
-    cout << "enter total: ";
-    cin >> cs.squant;
-    cout << "enter working total of workshops: ";
-    cin >> cs.wsquant;
+    cs.name = inputString("enter a name: ");
+    cs.squant = plusInt("enter total number of workshops: ");
+    cs.wsquant = inputInt("enter working total of workshops: ", 0, cs.squant);
+
     cout << "enter class: ";
     cin >> cs.type;
+
+    cin.ignore(10000, '\n');
 }
 void viewPipe(const Pipe& pipe) {
     if (pipe.name == "") {
@@ -77,20 +141,28 @@ void editPipe(Pipe& pipe) {
         cout << "\npipe has not been added\n";
         return;
     }
-    cout << "\nis pipe under repair? (1-yes, 0-no): ";
-    cin >> pipe.statePipe;
-    cout << "pipe changed\n";
+
+    viewPipe(pipe);
+    bool newState = inputInt("\nis pipe under repair? (1-yes, 0-no): ", 0, 1);
+    if (newState != pipe.statePipe) {
+        pipe.statePipe = newState;
+        cout<< "pipe changed\n";
+    }
+    else {
+        cout << "no changes were applied\n";
+    }
 }
 void editCS(CS& cs) {
     if (cs.name == "") {
         cout << "\nworkshop has not been added\n\n";
         return;
     }
-    int act;
+
+    viewCS(cs);
+
     cout << "\n1.start workshop\n";
     cout << "\n2.stop workshop\n";
-    cout << "\nplease, choose: \n";
-    cin >> act;
+    int act = inputInt("please, choose: ",1,2);
     if (act == 1) {
         if (cs.wsquant < cs.squant) {
             cs.wsquant++;
@@ -108,9 +180,7 @@ void editCS(CS& cs) {
         else {
             cout << "there are no working workshops(((\n";
         }
-    }
-    else {
-        cout << "sorry, wrong choice(((";
+    
     }
 }
 void Save(Pipe& pipe, CS& cs) {
@@ -120,17 +190,22 @@ void Save(Pipe& pipe, CS& cs) {
         return;
     }
 
-    bool pipeEx = pipe.name != "";
-    bool csEx = cs.name != "";
-    file << pipeEx << " " << csEx << endl;
-    
-    if (pipeEx) {
+    file <<"PIPE" << endl;
+
+    if (pipe.name!="") {
         file << pipe.name << endl;
         file << pipe.len << endl;
         file << pipe.d << endl;
         file << pipe.statePipe << endl;
     }
-    if (csEx) {
+    else {
+        file << 0 << endl;
+    }
+
+    file << "CS" << endl;
+
+    if (cs.name!="") {
+        file << 1 << endl;
         file << cs.name << endl;
         file << cs.squant << endl;
         file << cs.wsquant << endl;
@@ -147,21 +222,48 @@ void Load(Pipe& pipe, CS& cs) {
         return;
     }
 
-    bool pipeEx = pipe.name != "";
-    bool csEx = cs.name != "";
-    file >> pipeEx >> csEx;
+    string objType;
+    int exists;
 
-    if (pipeEx) {
-        file >> pipe.name;
+    getline(file, objType);
+    if (objType != "PIPE") {
+        cout << "\nfile error. pipe data not found\n";
+        return;
+    }
+
+    file >> exists;
+    file.ignore(10000, '\n');
+
+    if (exists == 1) {
+        getline(file, pipe.name);
         file >> pipe.len;
         file >> pipe.d;
         file >> pipe.statePipe;
+        file.ignore(10000, '\n');
     }
-    if (csEx) {
-        file >> cs.name;
+    else {
+        pipe = Pipe{};
+    }
+
+
+    getline(file, objType);
+    if (objType != "CS") {
+        cout << "\nfile error: CS data not found\n";
+        return;
+    }
+
+    file >> exists;
+    file.ignore(10000, '\n');
+    if (exists == 1) {
+        getline(file, cs.name);
         file >> cs.squant;
         file >> cs.wsquant;
         file >> cs.type;
+
+        file.ignore(10000, '\n');
+    }
+    else {
+        cs = CS{};
     }
 
     file.close();
@@ -184,8 +286,9 @@ int main()
         cout << "6. Save changes" << endl;
         cout << "7. Upload (file)" << endl;
         cout << "0. Exit" << endl;
-        cin >> mem;
-        
+
+        mem = inputInt("please, choose: ", 0, 7);
+
         switch (mem) {
         case 1:
             addPipe(pipe);
@@ -212,14 +315,11 @@ int main()
         case 0:
             return 0;
         default:
-            std::cout << "sorry((( wrong choice(((\n" << endl;
+            cout << "sorry((( wrong choice(((\n" << endl;
             break;
         }
     }
-    if (cin.fail()) {
-        cin.clear();
-        cin.ignore(100000, '\n');
-        cout << "wrong!( try again with a number..\n" << endl;
 
-    }
+    
 }
+
