@@ -222,20 +222,15 @@ void Save(const Pipe&pipe, const CS&cs) {
         cout<< "\ndata was saved\n";
 }
 
-void Load(Pipe& pipe, CS& cs) {
-    ifstream file("labaodin.txt");
-    if (!file) {
-        cout << "\nfile not found\n";
-        return;
-    }
-
+bool loadPipe(ifstream& file, Pipe& pipe) {
     string objType;
     int exists;
 
     getline(file, objType);
+
     if (objType != "PIPE") {
-        cout << "\nfile error. pipe data not found\n";
-        return;
+        cout << "\nfile error: pipe data not found\n";
+        return false;
     }
 
     file >> exists;
@@ -246,21 +241,31 @@ void Load(Pipe& pipe, CS& cs) {
         file >> pipe.len;
         file >> pipe.d;
         file >> pipe.statePipe;
+
         file.ignore(10000, '\n');
     }
     else {
         pipe = Pipe{};
     }
 
+    return true;
+}
+
+
+bool loadCS(ifstream& file, CS& cs) {
+    string objType;
+    int exists;
 
     getline(file, objType);
+
     if (objType != "CS") {
         cout << "\nfile error: CS data not found\n";
-        return;
+        return false;
     }
 
     file >> exists;
     file.ignore(10000, '\n');
+
     if (exists == 1) {
         getline(file, cs.name);
         file >> cs.squant;
@@ -273,9 +278,27 @@ void Load(Pipe& pipe, CS& cs) {
         cs = CS{};
     }
 
+    return true;
+}
+
+
+void Load(Pipe& pipe, CS& cs) {
+    ifstream file("labaodin.txt");
+
+    if (!file) {
+        cout << "\nfile not found\n";
+        return;
+    }
+    if (!loadPipe(file, pipe)) {
+        return;
+    }
+    if (!loadCS(file, cs)) {
+        return;
+    }
     file.close();
     cout << "\ndata was loaded\n";
 }
+
 
 int main()
 {
