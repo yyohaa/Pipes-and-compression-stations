@@ -157,9 +157,7 @@ void editCS(CS& cs) {
         cout << "\nworkshop has not been added\n\n";
         return;
     }
-
     viewCS(cs);
-
     cout << "\n1.start workshop\n";
     cout << "\n2.stop workshop\n";
     int act = inputInt("please, choose: ",1,2);
@@ -183,16 +181,11 @@ void editCS(CS& cs) {
     
     }
 }
-void Save(Pipe& pipe, CS& cs) {
-    ofstream file("labaodin.txt");
-    if (!file) {
-        cout << "file error";
-        return;
-    }
+void savePipe(const Pipe& pipe, ofstream& file) {
+    file << "PIPE" << endl;
 
-    file <<"PIPE" << endl;
-
-    if (pipe.name!="") {
+    if (pipe.name != "") {
+        file << 1 << endl;
         file << pipe.name << endl;
         file << pipe.len << endl;
         file << pipe.d << endl;
@@ -201,20 +194,34 @@ void Save(Pipe& pipe, CS& cs) {
     else {
         file << 0 << endl;
     }
+}
 
+void saveCS(const CS& cs, ofstream& file) {
     file << "CS" << endl;
-
-    if (cs.name!="") {
+    if (cs.name != "") {
         file << 1 << endl;
         file << cs.name << endl;
         file << cs.squant << endl;
         file << cs.wsquant << endl;
         file << cs.type << endl;
     }
-    
-    file.close();
-    cout << "\ndata was saved\n";
+    else {
+        file << 0 << endl;
+    }
 }
+
+void Save(const Pipe&pipe, const CS&cs) {
+    ofstream file("labaodin.txt");
+    if (!file) {
+        cout << "\nfile error\n";
+        return;
+    }
+    savePipe(pipe, file);
+    saveCS(cs, file);
+        file.close();
+        cout<< "\ndata was saved\n";
+}
+
 void Load(Pipe& pipe, CS& cs) {
     ifstream file("labaodin.txt");
     if (!file) {
@@ -319,7 +326,5 @@ int main()
             break;
         }
     }
-
-    
 }
 
