@@ -5,24 +5,12 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "Pipe.h"
+#include "CS.h"
 
 using namespace std;
 
 
-
-struct Pipe {
-    string name;
-    double len;
-    int d;
-    bool statePipe;
-};
-
-struct CS {
-    string name;
-    int squant;
-    int wsquant;
-    char type;
-};
 
 int inputInt(string text, int min, int max) {
     while (true) {
@@ -110,39 +98,13 @@ void addCS(CS& cs) {
 
     cin.ignore(10000, '\n');
 }
-void viewPipe(const Pipe& pipe) {
-    if (pipe.name == "") {
-        cout << "\npipe has not been added\n";
-        return;
-    }
-    cout << "\npipe\n";
-    cout << "name: " << pipe.name << endl;
-    cout << "lenght: " << pipe.len << endl;
-    cout << "diameter: " << pipe.d << endl;
-
-    if (pipe.statePipe)
-        cout << "under repair - yes\n";
-    else
-        cout << "under repair - no\n";
-}
-void viewCS(const CS& cs) {
-    if (cs.name == "") {
-        cout << "\nworkshop has not been added\n";
-        return;
-    }
-    cout << "\nCS\n";
-    cout << "name: " << cs.name << endl;
-    cout << "total of workshops: " << cs.squant << endl;
-    cout << "total working workshops: " << cs.wsquant << endl;
-    cout << "class: " << cs.type << endl;
-}
 void editPipe(Pipe& pipe) {
     if (pipe.name == "") {
         cout << "\npipe has not been added\n";
         return;
     }
 
-    viewPipe(pipe);
+    pipe.view();
     bool newState = inputInt("\nis pipe under repair? (1-yes, 0-no): ", 0, 1);
     if (newState != pipe.statePipe) {
         pipe.statePipe = newState;
@@ -157,7 +119,7 @@ void editCS(CS& cs) {
         cout << "\nworkshop has not been added\n\n";
         return;
     }
-    viewCS(cs);
+    cs.view();
     cout << "\n1.start workshop\n";
     cout << "\n2.stop workshop\n";
     int act = inputInt("please, choose: ",1,2);
@@ -183,7 +145,6 @@ void editCS(CS& cs) {
 }
 void savePipe(const Pipe& pipe, ofstream& file) {
     file << "PIPE" << endl;
-
     if (pipe.name != "") {
         file << 1 << endl;
         file << pipe.name << endl;
@@ -327,8 +288,8 @@ int main()
             addCS(compStation);
             break;
         case 3:
-            viewPipe(pipe);
-            viewCS(compStation);
+            pipe.view();
+            compStation.view();
             break;
         case 4:
             editPipe(pipe);
