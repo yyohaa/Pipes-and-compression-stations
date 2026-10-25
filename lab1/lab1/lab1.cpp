@@ -7,6 +7,7 @@
 #include <sstream>
 #include "Pipe.h"
 #include "CS.h"
+#include <vector>
 
 using namespace std;
 
@@ -17,10 +18,8 @@ int inputInt(string text, int min, int max) {
         cout << text;
         string line;
         getline(cin, line);
-
         stringstream ss(line);
         int val;
-
         if (ss >> val) {
             ss >> ws;
             if (ss.eof() && val >= min && val <= max) {
@@ -35,10 +34,8 @@ int plusInt(string text) {
         cout << text;
         string line;
         getline(cin, line);
-
         stringstream ss(line);
         int val;
-
         if (ss >> val) {
             ss >> ws;
             if (ss.eof() && val >0) {
@@ -47,17 +44,14 @@ int plusInt(string text) {
         }
         cout << "wrong input, try again with a positive number :)\n";
     }
-
 }
 double plusDouble(string text) {
     while (true) {
         cout << text;
         string line;
         getline(cin, line);
-
         stringstream ss(line);
         double val;
-
         if (ss >> val) {
             ss >> ws;
             if (ss.eof() && val > 0) {
@@ -72,7 +66,6 @@ string inputString(string text) {
         cout << text;
         string val;
         getline(cin, val);
-
         if (!val.empty() && val.find_first_not_of(" \t") != string::npos) {
             return val;
         }
@@ -86,24 +79,33 @@ void addPipe(Pipe& pipe){
     pipe.len = plusDouble("enter lenght(km): ");
     pipe.d = plusInt("enter diameter (mm): ");
     pipe.statePipe = inputInt("is a pipe under construction (1-yes, 0-no): \n", 0, 1);
-    }
+}
 void addCS(CS& cs) {
     cout << "add a compression station\n";
     cs.name = inputString("enter a name: ");
     cs.squant = plusInt("enter total number of workshops: ");
     cs.wsquant = inputInt("enter working total of workshops: ", 0, cs.squant);
-
     cout << "enter class: ";
     cin >> cs.type;
-
     cin.ignore(10000, '\n');
+}
+void addNewCS(vector<CS>& stations) {
+    CS cs{};
+    addCS(cs);
+    stations.push_back(cs);
+    cout << "CS added\n";
+}
+void addNewPipe(vector<Pipe>& pipes) {
+    Pipe pipe;
+    addPipe(pipe);
+    pipes.push_back(pipe);
+    cout << "pipe added\n";
 }
 void editPipe(Pipe& pipe) {
     if (pipe.name == "") {
         cout << "\npipe has not been added\n";
         return;
     }
-
     pipe.view();
     bool newState = inputInt("\nis pipe under repair? (1-yes, 0-no): ", 0, 1);
     if (newState != pipe.statePipe) {
@@ -113,6 +115,24 @@ void editPipe(Pipe& pipe) {
     else {
         cout << "no changes were applied\n";
     }
+}
+void editSelectedPipe(vector<Pipe>& pipes) {
+    if (pipes.empty()) {
+        cout << "\nno pipes added\n";
+        return;
+    }
+    viewPipes(pipes);
+    int number = inputInt("choose pipe number: ", 1, (int)pipes.size());
+    editPipe(pipes[number - 1]);
+}
+void editSelectedCS(vector<CS>& stations) {
+    if (stations.empty()) {
+        cout << "\nno workshops added\n";
+        return;
+    }
+    viewStations(stations);
+    int number = inputInt("choose workshop number: ", 1, (int)stations.size());
+    editPipe(stations[number - 1]);
 }
 void editCS(CS& cs) {
     if (cs.name == "") {
@@ -140,10 +160,9 @@ void editCS(CS& cs) {
         else {
             cout << "there are no working workshops(((\n";
         }
-    
     }
 }
-void savePipe(const Pipe& pipe, ofstream& file) {
+void savePipe(const vector<Pipe>& pipes, ofstream& file) {
     file << "PIPE" << endl;
     if (pipe.name != "") {
         file << 1 << endl;
@@ -156,7 +175,6 @@ void savePipe(const Pipe& pipe, ofstream& file) {
         file << 0 << endl;
     }
 }
-
 void saveCS(const CS& cs, ofstream& file) {
     file << "CS" << endl;
     if (cs.name != "") {
@@ -170,7 +188,6 @@ void saveCS(const CS& cs, ofstream& file) {
         file << 0 << endl;
     }
 }
-
 void Save(const Pipe&pipe, const CS&cs) {
     ofstream file("labaodin.txt");
     if (!file) {
@@ -182,7 +199,6 @@ void Save(const Pipe&pipe, const CS&cs) {
         file.close();
         cout<< "\ndata was saved\n";
 }
-
 bool loadPipe(ifstream& file, Pipe& pipe) {
     string objType;
     int exists;
@@ -211,8 +227,6 @@ bool loadPipe(ifstream& file, Pipe& pipe) {
 
     return true;
 }
-
-
 bool loadCS(ifstream& file, CS& cs) {
     string objType;
     int exists;
@@ -223,26 +237,20 @@ bool loadCS(ifstream& file, CS& cs) {
         cout << "\nfile error: CS data not found\n";
         return false;
     }
-
     file >> exists;
     file.ignore(10000, '\n');
-
     if (exists == 1) {
         getline(file, cs.name);
         file >> cs.squant;
         file >> cs.wsquant;
         file >> cs.type;
-
         file.ignore(10000, '\n');
     }
     else {
         cs = CS{};
     }
-
     return true;
 }
-
-
 void Load(Pipe& pipe, CS& cs) {
     ifstream file("labaodin.txt");
 
@@ -259,12 +267,32 @@ void Load(Pipe& pipe, CS& cs) {
     file.close();
     cout << "\ndata was loaded\n";
 }
+void viewPipes(const vector<Pipe>& pipes) {
+    if (pipes.empty()) {
+        cout << "\nno pipes added";
+        return;
+    }
+    for (int i = 0; i < (int)pipes.size(); i++) {
+        cout << "\nPipe number " << i + 1 << endl;
+        pipes[i].view();
+    }
+}
 
+void viewStations(const vector<CS>& stations) {
+    if (stations.empty()) {
+        cout << "\nno workshops added";
+        return;
+    }
+    for (int i = 0; i < (int)stations.size(); i++) {
+        cout << "\nPipe number " << i + 1 << endl;
+        stations[i].view();
+    }
+}
 
 int main()
 {
-    Pipe pipe;
-    CS compStation;
+    vector <Pipe> pipes;
+    vector <CS> stations;
     
     int mem;
     for (;;) {
@@ -282,26 +310,26 @@ int main()
 
         switch (mem) {
         case 1:
-            addPipe(pipe);
+            addNewPipe(pipes);
             break;
         case 2:
-            addCS(compStation);
+            addNewCS(stations);
             break;
         case 3:
-            pipe.view();
-            compStation.view();
+            viewPipes(pipes);
+            viewStations(stations);
             break;
         case 4:
-            editPipe(pipe);
+            editSelectedPipe(pipes);
             break;
         case 5:
-            editCS(compStation);
+            editSelectedCS(stations);
             break;
         case 6:
-            Save(pipe, compStation);
+            Save(pipes, stations);
             break;
         case 7:
-            Load(pipe, compStation);
+            Load(pipes, stations);
             break;
         case 0:
             return 0;
