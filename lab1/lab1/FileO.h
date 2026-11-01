@@ -3,6 +3,6 @@
 #include "CS.h"
 #include <vector>
 
-void Save(const std::vector<Pipe>& pipes, const std::vector<CS>& stations, int nextId);
-void Load(const std::vector<Pipe>& pipes, const std::vector<CS>& stations, int & nextId);
-void fileMenu(std::vector<Pipe>&, std::vector<CS>&, int&nextId);
+void Save(const std::vector<Pipe>& pipes, const std::vector<CS>& stations, int& nextPipeId, int& nextCSId);
+void Load(const std::vector<Pipe>& pipes, const std::vector<CS>& stations, int& nextPipeId, int& nextCSId);
+void fileMenu(std::vector<Pipe>&pipes, std::vector<CS>&stations, int&nextPipeId, int&nextCSId);

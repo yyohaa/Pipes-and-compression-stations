@@ -12,10 +12,6 @@ public:
     void view() const;
 };
 
-void addCS(CS& cs);
 void addNewCS(std::vector<CS>& stations, int& nextId);
 void viewStations(const std::vector<CS>& stations);
-void editCS(CS& cs);
-void editSelectedCS(std::vector<CS>& stations);
-void deleteSelectedCS(std::vector<CS>& stations);
 void stationMenu(std::vector<CS>& stations);

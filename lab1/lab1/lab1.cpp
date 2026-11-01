@@ -45,41 +45,38 @@ int main(int argc, char* argv[])
 
     int nextPipeId = 1;
     int nextCSId = 1;
-    vector <Pipe> pipes;
-    vector <CS> stations;
-    int nextId = 1;
     int mem;
     for (;;) {
         cout << "\n\nHello, user<3! please, choose: " << endl;
         cout << "1. Add a pipe" << endl;
         cout << "2. Add a compression station (CS)" << endl;
         cout << "3. View all" << endl;
-        cout << "4. Edit: pipe" << endl;
-        cout << "5. Edit: compression station" << endl;
-        cout << "6. Save changes" << endl;
+        cout << "4. action: pipe" << endl;
+        cout << "5. action: compression station" << endl;
+        cout << "6. Save/load" << endl;
         cout << "0. Exit" << endl;
 
-        mem = inputInt("please, choose: ", 0, 7);
+        mem = inputInt("please, choose: ", 0, 6);
 
         switch (mem) {
         case 1:
-            addNewPipe(pipes, nextId);
+            addNewPipe(pipes, nextPipeId);
             break;
         case 2:
-            addNewCS(stations, nextId);
+            addNewCS(stations, nextCSId);
             break;
         case 3:
             viewPipes(pipes);
             viewStations(stations);
             break;
         case 4:
-            editSelectedPipe(pipes);
+            pipeMenu(pipes);
             break;
         case 5:
-            editSelectedCS(stations);
+            stationMenu(stations);
             break;
         case 6:
-            fileMenu(pipes, stations, nextId);
+            fileMenu(pipes, stations, nextPipeId, nextCSId);
             break;
         case 0:
             if (oldCin != nullptr) {
@@ -87,7 +84,7 @@ int main(int argc, char* argv[])
             }
             return 0;
         default:
-            cout << "sorry((( wrong choice(((\n" << endl;
+            cout << "sorry((( wrong input(((\n" << endl;
             break;
         }
     }

@@ -12,10 +12,6 @@ public:
     void view() const;
 };
 
-void addPipe(Pipe& pipe);
 void addNewPipe(std::vector<Pipe>& pipes, int& nextId);
 void viewPipes(const std::vector<Pipe>& pipes);
-void editPipe(Pipe& pipe);
-void editSelectedPipe(std::vector<Pipe>& pipes);
-void deleteSelectedPipe(std::vector<Pipe>& pipes);
 void pipeMenu(std::vector<Pipe>& pipes);

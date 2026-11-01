@@ -125,10 +125,12 @@ void Load(vector<Pipe>& pipes, vector<CS>& stations, int& nextId) {
     cout << "\ndata was loaded\n";
 }
 
-void fileMenu(vector<Pipe>& pipes, vector<CS>& stations, int& nextId) {
-    cout << "\n1. Save\n2. Load\n0. Back\n";
+void fileMenu(vector<Pipe>& pipes, vector<CS>& stations, int& nextPipeId, int& nextCSId) {
+    cout << "\n1. Save\n";
+    cout << "\n2. Load\n";
+    cout << "\n0. Back\n";
     int act = inputInt("please, choose: ", 0, 2);
 
-    if (act == 1) Save(pipes, stations, nextId);
-    if (act == 2) Load(pipes, stations, nextId);
+    if (act == 1) Save(pipes, stations, nextPipeId, nextCSId);
+    if (act == 2) Load(pipes, stations, nextPipeId, nextCSId);
 }

@@ -6,16 +6,12 @@
 using namespace std;
 
 void CS::view() const {
-	if (name == " ") {
-		cout << "\npipe has not been added\n";
-		return;
-	}
 	cout << "\nCS\n";
-	cout << "\nID: \n" << id << endl;
-	cout << "\nname: \n" << name << endl;
-	cout << "\ntotal of workshops: \n" << squant << endl;
-	cout << "\ntotal of working workshops: \n" << wsquant << endl;
-	cout << "\ncalss: \n" << type << endl;
+	cout << "ID: " << id << endl;
+	cout << "name: " << name << endl;
+	cout << "total of workshops: " << squant << endl;
+	cout << "total of working workshops: " << wsquant << endl;
+	cout << "calss: " << type << endl;
 }
 
 void addNewCS(vector<CS>& stations, int& nextId) {
@@ -41,7 +37,6 @@ void viewStations(const vector<CS>& stations) {
 		cout << "\nno stations added\n";
 		return;
 	}
-
 	for (const CS& cs : stations) {
 		cs.view();
 	}
@@ -51,9 +46,7 @@ void editCS(CS& cs) {
 	cs.view();
 	cout << "\n1.start workshop\n";
 	cout << "2.stop workshop\n";
-
 	int act = inputInt("please, choose: ", 1, 2);
-
 	if (act == 1) {
 		if (cs.wsquant < cs.squant) {
 			cs.wsquant++;
@@ -69,7 +62,6 @@ void editCS(CS& cs) {
 		else cout << "there are no working workshops\n";
 	}
 }
-
 
 int findCS(const vector<CS>& stations, int id) {
 	for (int i = 0; i < (int)stations.size(); i++) {
@@ -111,13 +103,50 @@ void deleteSelectedCS(vector<CS>& stations) {
 	cout << "CS deleted\n";
 }
 
+void findStationsByName(const vector<CS>& stations) {
+	string name = inputString("enter name: ");
+	int found = 0;
+	for (const CS& cs : stations) {
+		if (cs.name == name) {
+			cs.view();
+			found++;
+		}
+	}
+	if (found == 0) cout << "no stations found\n";
+}
+
+void findStationsByPercent(const vector<CS>& stations) {
+	int percent = inputInt("unused percent (0-100): ", 0, 100);
+	int found = 0;
+	for (const CS& cs : stations) {
+		if (unusedPercent(cs) == percent) {
+			cs.view();
+			found++;
+		}
+	}
+	if (found == 0) cout << "no stations found\n";
+}
+
+void searchStations(const vector<CS>& stations) {
+	if (stations.empty()) {
+		cout << "no stations added\n";
+		return;
+	}
+	cout << "\n1. Search by name\n";
+	cout << "2. Search by unused percent\n";
+	int act = inputInt("choose filter: ", 1, 2);
+
+	if (act == 1) findStationsByName(stations);
+	else findStationsByPercent(stations);
+}
+
 void stationMenu(vector<CS>& stations) {
 	cout << "\n1. Edit a CS\n";
 	cout << "2. Delete a CS\n";
+	cout << "3. search stations\n";
 	cout << "0. Back\n";
-
-	int act = inputInt("please, choose: ", 0, 2);
-
+	int act = inputInt("please, choose: ", 0, 3);
 	if (act == 1) editSelectedCS(stations);
 	if (act == 2) deleteSelectedCS(stations);
+	if (act == 3) searchStations(stations);
 }
