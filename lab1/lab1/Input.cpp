@@ -3,13 +3,17 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <stdexcept>
 
 using namespace std;
 
 string readLine(string text) {
     cout << text;
     string line;
-    getline(cin, line);
+    if (getline(cin, line)) {
+        throw runtime_error("input finished");
+    }
+    cerr << line << '\n'<< endl;
     return line;
 }
 

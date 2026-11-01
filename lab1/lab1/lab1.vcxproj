@@ -135,6 +135,7 @@
     <ClInclude Include="FileO.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Pipe.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
