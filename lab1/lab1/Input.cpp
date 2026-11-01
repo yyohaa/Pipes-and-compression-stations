@@ -10,7 +10,7 @@ using namespace std;
 string readLine(string text) {
     cout << text;
     string line;
-    if (getline(cin, line)) {
+    if (!getline(cin, line)) {
         throw runtime_error("input finished");
     }
     cerr << line << '\n'<< endl;

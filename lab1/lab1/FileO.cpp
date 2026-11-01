@@ -21,9 +21,10 @@ void saveCS(const CS& cs, ofstream& file) {
     file << cs.type << '\n';
 }
 
-void Save(const vector<Pipe>& pipes, const vector<CS>& stations, int nextId) {
+void Save(const vector<Pipe>& pipes, const vector<CS>& stations, int nextPipeId, int nextCSId) {
     ofstream file(inputString("enter file name to save: "));
-    if (!file) { cout << "\nfile error\n"; return; }
+    if (!file) { 
+        cout << "\nfile error\n"; return; }
 
     file << "PIPES\n" << pipes.size() << '\n';
     for (const Pipe& pipe : pipes) savePipe(pipe, file);
@@ -31,7 +32,8 @@ void Save(const vector<Pipe>& pipes, const vector<CS>& stations, int nextId) {
     file << "CS\n" << stations.size() << '\n';
     for (const CS& cs : stations) saveCS(cs, file);
 
-    file << "NEXT_ID\n" << nextId << '\n';
+    file << "NEXT_PIPE_ID\n" << nextPipeId << '\n';
+    file << "NEXT_CS_ID\n" << nextCSId << '\n';
     file.close();
     cout << (file ? "\ndata was saved\n" : "\nfile write error\n");
 }
@@ -80,48 +82,69 @@ bool loadStations(ifstream& file, vector<CS>& stations, int count) {
     return true;
 }
 
-bool validIDs(const vector<Pipe>& pipes, const vector<CS>& stations, int nextId) {
-    vector<int> ids;
-    for (const Pipe& pipe : pipes) ids.push_back(pipe.id);
-    for (const CS& cs : stations) ids.push_back(cs.id);
-
-    for (int i = 0; i < (int)ids.size(); i++) {
-        if (ids[i] <= 0 || ids[i] >= nextId) return false;
-        for (int j = 0; j < i; j++)
-            if (ids[i] == ids[j]) return false;
+bool validPipeIDs(const vector<Pipe>& pipes, int nextPipeId) {
+    if (nextPipeId < 1) return false;
+    for (int i = 0; i < (int)pipes.size(); i++) {
+        if (pipes[i].id < 1 || pipes[i].id >= nextPipeId)
+            return false;
+        for (int j = 0; j < i; j++) {
+            if (pipes[i].id == pipes[j].id) return false;
+        }
     }
     return true;
 }
 
-bool loadData(ifstream& file, vector<Pipe>& pipes,
-    vector<CS>& stations, int& nextId) {
+bool validCSIDs(const vector<CS>& stations, int nextCSId) {
+    if (nextCSId < 1) return false;
+    for (int i = 0; i < (int)stations.size(); i++) {
+        if (stations[i].id < 1 || stations[i].id >= nextCSId)
+            return false;
+        for (int j = 0; j < i; j++) {
+            if (stations[i].id == stations[j].id) return false;
+        }
+    }
+    return true;
+}
+
+bool loadData(ifstream& file, vector<Pipe>& pipes, vector<CS>& stations, int& nextPipeId, int& nextCSId) {
     int pipeCount, stationCount;
     string label;
 
-    if (!loadCount(file, "PIPES", pipeCount) || !loadPipes(file, pipes, pipeCount)) return false;
-    if (!loadCount(file, "CS", stationCount) || !loadStations(file, stations, stationCount)) return false;
-    if (!getline(file, label) || label != "NEXT_ID") return false;
-    if (!(file >> nextId) || nextId < 1) return false;
-
-    return validIDs(pipes, stations, nextId);
+    if (!loadCount(file, "PIPES", pipeCount)) return false;
+    if (!loadPipes(file, pipes, pipeCount)) return false;
+    if (!loadCount(file, "CS", stationCount)) return false;
+    if (!loadStations(file, stations, stationCount)) return false;
+    if (!getline(file, label) || label != "NEXT_PIPE_ID")
+        return false;
+    if (!(file >> nextPipeId)) return false;
+    file.ignore(10000, '\n');
+    if (!getline(file, label) || label != "NEXT_CS_ID")
+        return false;
+    if (!(file >> nextCSId)) return false;
+    return validPipeIDs(pipes, nextPipeId) &&
+        validCSIDs(stations, nextCSId);
 }
 
-void Load(vector<Pipe>& pipes, vector<CS>& stations, int& nextId) {
+void Load(vector<Pipe>& pipes, vector<CS>& stations, int& nextPipeId, int& nextCSId) {
     ifstream file(inputString("enter file name to load: "));
-    if (!file) { cout << "\nfile not found\n"; return; }
+    if (!file) { 
+        cout << "\nfile not found\n"; return; 
+    }
 
     vector<Pipe> newPipes;
     vector<CS> newStations;
-    int loadedNextId = 1;
+    int loadedPipeId = 1;
+    int loadedCSId = 1;
 
-    if (!loadData(file, newPipes, newStations, loadedNextId)) {
+    if (!loadData(file, newPipes, newStations, loadedPipeId, loadedCSId)) {
         cout << "\nfile data error\n";
         return;
     }
 
     pipes = newPipes;
     stations = newStations;
-    nextId = loadedNextId;
+    nextPipeId = loadedPipeId;
+    nextCSId = loadedCSId;
     cout << "\ndata was loaded\n";
 }
 

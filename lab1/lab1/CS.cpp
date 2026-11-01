@@ -4,6 +4,8 @@
 #include "Input.h"
 
 using namespace std;
+void addCS(CS& cs);
+int unusedPercent(const CS& cs);
 
 void CS::view() const {
 	cout << "\nCS\n";
@@ -125,6 +127,11 @@ void findStationsByPercent(const vector<CS>& stations) {
 		}
 	}
 	if (found == 0) cout << "no stations found\n";
+}
+
+int unusedPercent(const CS& cs) {
+	if (cs.squant == 0) return 0;
+	return (cs.squant - cs.wsquant) * 100 / cs.squant;
 }
 
 void searchStations(const vector<CS>& stations) {

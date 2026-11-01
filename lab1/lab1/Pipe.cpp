@@ -112,14 +112,16 @@ vector <int> findPipesByState(const vector<Pipe>& pipes, bool state) {
 	return found;
 }
 
-vector <int> viewFoundPipes(const vector<Pipe>& pipes, const vector<int>& found) {
+void viewFoundPipes(const vector<Pipe>& pipes, const vector<int>& found) {
 	if (found.empty()) {
 		cout << "no pipes found\n";
 		return;
 	}
 	for (int id : found) {
 		int index = findPipe(pipes, id);
-		if (index != -1) pipes[index].view();
+		if (index != -1) {
+			pipes[index].view();
+		}
 	}
 }
 
@@ -128,10 +130,8 @@ bool hasId(const vector<int>& ids, int id) {
 		if (number == id) {
 			return true;
 		}
-		else {
-			return false;
-		}
 	}
+	return false;
 }
 
 vector<int> selectPipeIds(const vector<int>& found) {
