@@ -2,7 +2,6 @@
 #include "Input.h"
 #include <iostream>
 #include <sstream>
-#include <vector>
 #include <stdexcept>
 
 using namespace std;

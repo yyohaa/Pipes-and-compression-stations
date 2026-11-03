@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 class Pipe {
 public:
@@ -12,6 +12,6 @@ public:
     void view() const;
 };
 
-void addNewPipe(std::vector<Pipe>& pipes, int& nextId);
-void viewPipes(const std::vector<Pipe>& pipes);
-void pipeMenu(std::vector<Pipe>& pipes);
+void addNewPipe(std::unordered_map <int, Pipe>& pipes, int& nextId);
+void viewPipes(const std::unordered_map <int, Pipe>& pipes);
+void pipeMenu(std::unordered_map <int, Pipe>& pipes);

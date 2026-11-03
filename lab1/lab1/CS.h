@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 class CS {
 public:
@@ -12,6 +12,6 @@ public:
     void view() const;
 };
 
-void addNewCS(std::vector<CS>& stations, int& nextId);
-void viewStations(const std::vector<CS>& stations);
-void stationMenu(std::vector<CS>& stations);
+void addNewCS(std::unordered_map<int, CS>& stations, int& nextId);
+void viewStations(const std::unordered_map<int, CS>& stations);
+void stationMenu(std::unordered_map<int, CS>& stations);

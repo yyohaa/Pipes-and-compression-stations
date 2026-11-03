@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 using namespace std;
 
@@ -21,17 +21,15 @@ void saveCS(const CS& cs, ofstream& file) {
     file << cs.type << '\n';
 }
 
-void Save(const vector<Pipe>& pipes, const vector<CS>& stations, int nextPipeId, int nextCSId) {
+void Save(const unordered_map<int, Pipe>& pipes, const unordered_map<int, CS>& stations, int nextPipeId, int nextCSId) {
     ofstream file(inputString("enter file name to save: "));
     if (!file) { 
         cout << "\nfile error\n"; return; }
 
     file << "PIPES\n" << pipes.size() << '\n';
-    for (const Pipe& pipe : pipes) savePipe(pipe, file);
-
+    for (const auto& item : pipes) savePipe(item.second, file);
     file << "CS\n" << stations.size() << '\n';
-    for (const CS& cs : stations) saveCS(cs, file);
-
+    for (const auto& item : stations) saveCS(item.second, file);
     file << "NEXT_PIPE_ID\n" << nextPipeId << '\n';
     file << "NEXT_CS_ID\n" << nextCSId << '\n';
     file.close();
@@ -64,75 +62,67 @@ bool loadCount(ifstream& file, string label, int& count) {
     return true;
 }
 
-bool loadPipes(ifstream& file, vector<Pipe>& pipes, int count) {
+bool loadPipes(ifstream& file, unordered_map<int, Pipe>& pipes, int count) {
     for (int i = 0; i < count; i++) {
         Pipe pipe{};
         if (!loadPipe(file, pipe)) return false;
-        pipes.push_back(pipe);
+        if (pipes.find(pipe.id) != pipes.end()) return false;
+        pipes[pipe.id] = pipe;
     }
     return true;
 }
 
-bool loadStations(ifstream& file, vector<CS>& stations, int count) {
+bool loadStations(ifstream& file, unordered_map<int, CS>& stations, int count) {
     for (int i = 0; i < count; i++) {
         CS cs{};
         if (!loadCS(file, cs)) return false;
-        stations.push_back(cs);
+        if (stations.find(cs.id) != stations.end()) return false;
+        stations[cs.id] = cs;
     }
     return true;
 }
 
-bool validPipeIDs(const vector<Pipe>& pipes, int nextPipeId) {
+bool validPipeIDs(const unordered_map<int, Pipe>& pipes, int nextPipeId) {
     if (nextPipeId < 1) return false;
-    for (int i = 0; i < (int)pipes.size(); i++) {
-        if (pipes[i].id < 1 || pipes[i].id >= nextPipeId)
-            return false;
-        for (int j = 0; j < i; j++) {
-            if (pipes[i].id == pipes[j].id) return false;
-        }
+    for (const auto& item : pipes) {
+        int id = item.first;
+        if (id != item.second.id) return false;
     }
     return true;
 }
 
-bool validCSIDs(const vector<CS>& stations, int nextCSId) {
+bool validCSIDs(const unordered_map<int, CS>& stations, int nextCSId) {
     if (nextCSId < 1) return false;
-    for (int i = 0; i < (int)stations.size(); i++) {
-        if (stations[i].id < 1 || stations[i].id >= nextCSId)
-            return false;
-        for (int j = 0; j < i; j++) {
-            if (stations[i].id == stations[j].id) return false;
-        }
+    for (const auto& item : stations) {
+        int id = item.first;
+        if (id < 1 || id >= nextCSId) return false;
+        if (id != item.second.id) return false;
     }
     return true;
 }
 
-bool loadData(ifstream& file, vector<Pipe>& pipes, vector<CS>& stations, int& nextPipeId, int& nextCSId) {
+bool loadData(ifstream& file, unordered_map<int, Pipe>& pipes, unordered_map<int, CS>& stations, int& nextPipeId, int& nextCSId) {
     int pipeCount, stationCount;
     string label;
-
     if (!loadCount(file, "PIPES", pipeCount)) return false;
     if (!loadPipes(file, pipes, pipeCount)) return false;
     if (!loadCount(file, "CS", stationCount)) return false;
     if (!loadStations(file, stations, stationCount)) return false;
-    if (!getline(file, label) || label != "NEXT_PIPE_ID")
-        return false;
+    if (!getline(file, label) || label != "NEXT_PIPE_ID") return false;
     if (!(file >> nextPipeId)) return false;
     file.ignore(10000, '\n');
-    if (!getline(file, label) || label != "NEXT_CS_ID")
-        return false;
+    if (!getline(file, label) || label != "NEXT_CS_ID") return false;
     if (!(file >> nextCSId)) return false;
-    return validPipeIDs(pipes, nextPipeId) &&
-        validCSIDs(stations, nextCSId);
+    return validPipeIDs(pipes, nextPipeId) && validCSIDs(stations, nextCSId);
 }
 
-void Load(vector<Pipe>& pipes, vector<CS>& stations, int& nextPipeId, int& nextCSId) {
+void Load(unordered_map<int, Pipe>& pipes, unordered_map<int, CS>& stations, int& nextPipeId, int& nextCSId) {
     ifstream file(inputString("enter file name to load: "));
     if (!file) { 
         cout << "\nfile not found\n"; return; 
     }
-
-    vector<Pipe> newPipes;
-    vector<CS> newStations;
+    unordered_map<int, Pipe> newPipes;
+    unordered_map<int, CS> newStations;
     int loadedPipeId = 1;
     int loadedCSId = 1;
 
@@ -148,7 +138,7 @@ void Load(vector<Pipe>& pipes, vector<CS>& stations, int& nextPipeId, int& nextC
     cout << "\ndata was loaded\n";
 }
 
-void fileMenu(vector<Pipe>& pipes, vector<CS>& stations, int& nextPipeId, int& nextCSId) {
+void fileMenu(unordered_map<int, Pipe>& pipes, unordered_map<int, CS>& stations, int& nextPipeId, int& nextCSId) {
     cout << "\n1. Save\n";
     cout << "\n2. Load\n";
     cout << "\n0. Back\n";

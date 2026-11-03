@@ -1,6 +1,6 @@
 #include "CS.h"
 #include <iostream>
-#include <vector>
+#include <unordered_map>
 #include "Input.h"
 
 using namespace std;
@@ -16,15 +16,6 @@ void CS::view() const {
 	cout << "calss: " << type << endl;
 }
 
-void addNewCS(vector<CS>& stations, int& nextId) {
-	CS cs{};
-	addCS(cs);
-	cs.id = nextId++;
-	stations.push_back(cs);
-	cout << "CS added, ID:" << cs.id << endl;
-}
-
-
 void addCS(CS& cs) {
 	cout << "add a compression station\n";
 	cs.name = inputString("enter a name: ");
@@ -34,13 +25,21 @@ void addCS(CS& cs) {
 	cs.type = className[0];
 }
 
-void viewStations(const vector<CS>& stations) {
+void addNewCS(unordered_map<int,CS>& stations, int& nextId) {
+	CS cs{};
+	addCS(cs);
+	cs.id = nextId++;
+	stations[cs.id]=cs;
+	cout << "CS added, ID:" << cs.id << endl;
+}
+
+void viewStations(const unordered_map<int, CS>& stations) {
 	if (stations.empty()) {
 		cout << "\nno stations added\n";
 		return;
 	}
-	for (const CS& cs : stations) {
-		cs.view();
+	for (const auto& item : stations) {
+		item.second.view();
 	}
 }
 
@@ -65,63 +64,42 @@ void editCS(CS& cs) {
 	}
 }
 
-int findCS(const vector<CS>& stations, int id) {
-	for (int i = 0; i < (int)stations.size(); i++) {
-		if (stations[i].id == id) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-void editSelectedCS(vector<CS>& stations) {
+void editSelectedCS(unordered_map<int,CS>& stations) {
 	if (stations.empty()) {
 		cout << "no stations added\n";
 		return;
 	}
 	viewStations(stations);
 	int id = plusInt("enter CS ID: ");
-	int index = findCS(stations, id);
-	if (index == -1) {
+	auto it = stations.find(id);
+	if (it == stations.end()) {
 		cout << "CS not found\n";
 		return;
 	}
-	editCS(stations[index]);
+	editCS(it -> second);
 }
 
-void deleteSelectedCS(vector<CS>& stations) {
+void deleteSelectedCS(unordered_map<int, CS>& stations) {
 	if (stations.empty()) {
 		cout << "no stations added\n";
 		return;
 	}
 	viewStations(stations);
 	int id = plusInt("enter CS ID to delete: ");
-	int index = findCS(stations, id);
-	if (index == -1) {
+	if (stations.find(id) == stations.end()) {
 		cout << "CS not found\n";
 		return;
 	}
-	stations.erase(stations.begin() + index);
+	stations.erase(id);
 	cout << "CS deleted\n";
 }
 
-void findStationsByName(const vector<CS>& stations) {
+void findStationsByName(const unordered_map<int, CS>& stations) {
 	string name = inputString("enter name: ");
 	int found = 0;
-	for (const CS& cs : stations) {
+	for (const auto& item : stations) {
+		const CS& cs = item.second;
 		if (cs.name == name) {
-			cs.view();
-			found++;
-		}
-	}
-	if (found == 0) cout << "no stations found\n";
-}
-
-void findStationsByPercent(const vector<CS>& stations) {
-	int percent = inputInt("unused percent (0-100): ", 0, 100);
-	int found = 0;
-	for (const CS& cs : stations) {
-		if (unusedPercent(cs) == percent) {
 			cs.view();
 			found++;
 		}
@@ -134,7 +112,20 @@ int unusedPercent(const CS& cs) {
 	return (cs.squant - cs.wsquant) * 100 / cs.squant;
 }
 
-void searchStations(const vector<CS>& stations) {
+void findStationsByPercent(const unordered_map<int, CS>& stations) {
+	int percent = inputInt("unused percent (0-100): ", 0, 100);
+	int found = 0;
+	for (const auto& item : stations) {
+		const CS& cs = item.second;
+		if (unusedPercent(cs) == percent) {
+			cs.view();
+			found++;
+		}
+	}
+	if (found == 0) cout << "no stations found\n";
+}
+
+void searchStations(const unordered_map<int, CS>& stations) {
 	if (stations.empty()) {
 		cout << "no stations added\n";
 		return;
@@ -147,7 +138,7 @@ void searchStations(const vector<CS>& stations) {
 	else findStationsByPercent(stations);
 }
 
-void stationMenu(vector<CS>& stations) {
+void stationMenu(unordered_map<int, CS>& stations) {
 	cout << "\n1. Edit a CS\n";
 	cout << "2. Delete a CS\n";
 	cout << "3. search stations\n";

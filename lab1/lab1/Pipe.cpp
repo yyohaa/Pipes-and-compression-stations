@@ -1,6 +1,7 @@
 #include "Pipe.h"
 #include <iostream>
 #include "Input.h"
+#include <vector>
 
 using namespace std;
 
@@ -11,15 +12,6 @@ void Pipe::view() const {
 	cout << "length: " << len << endl;
 	cout << "diameter: " << d << endl;
 	cout << "under repair? - " << (statePipe ? "yes" : "no") << endl;
-}
-
-int findPipe(const vector<Pipe>& pipes, int id) {
-	for (int i = 0; i < (int)pipes.size(); i++) {
-		if (pipes[i].id == id) {
-			return i;
-		}
-	}
-	return -1;
 }
 
 void addPipe(Pipe& pipe) {
@@ -33,7 +25,6 @@ void addPipe(Pipe& pipe) {
 void editPipe(Pipe& pipe) {
 	pipe.view();
 	bool newState = inputInt("is pipe under repair? (1-yes, 0-no): ", 0, 1);
-
 	if (newState != pipe.statePipe) {
 		pipe.statePipe = newState;
 		cout << "pipe changed\n";
@@ -43,84 +34,82 @@ void editPipe(Pipe& pipe) {
 	}
 }
 
-void addNewPipe(vector<Pipe>& pipes, int& nextPipeId) {
+void addNewPipe(unordered_map<int, Pipe>& pipes, int& nextPipeId) {
 	Pipe pipe{};
 	addPipe(pipe);
 	pipe.id = nextPipeId++;
-	pipes.push_back(pipe);
+	pipes[pipe.id]=pipe;
 	cout << "pipe added, ID:" << pipe.id << endl;
 }
 
-void viewPipes(const vector<Pipe>& pipes) {
+void viewPipes(const unordered_map<int, Pipe>& pipes) {
 	if (pipes.empty()) {
 		cout << "\nno pipes added\n";
 		return;
 	}
-	for (const Pipe& pipe : pipes) {
-		pipe.view();
+	for (const auto& item : pipes) {
+		item.second.view();
 	}
 }
 
-void editSelectedPipe(vector<Pipe>& pipes) {
+void editSelectedPipe(unordered_map<int, Pipe>& pipes) {
 	if (pipes.empty()) {
 		cout << "no pipes added\n";
 		return;
 	}
 	viewPipes(pipes);
 	int id = plusInt("enter pipe id: ");
-	int index = findPipe(pipes, id);
-	if (index == -1) {
+	auto it = pipes.find(id);
+	if (it == pipes.end()) {
 		cout << "pipe not found\n";
 		return;
 	}
-	editPipe(pipes[index]);
+	editPipe(it->second);
 }
 
-void deleteSelectedPipe(vector<Pipe>& pipes) {
+void deleteSelectedPipe(unordered_map<int, Pipe>& pipes) {
 	if (pipes.empty()) {
 		cout << "no pipes added\n";
 		return;
 	}
 	viewPipes(pipes);
 	int id = plusInt("enter pipe id: ");
-	int index = findPipe(pipes, id);
-	if (index == -1) {
+	if (pipes.erase(id) == 0) {
 		cout << "pipe not found\n";
 		return;
 	}
-	pipes.erase(pipes.begin() + index);
 	cout << "pipe deleted\n";
 }
 
-vector <int> findPipesByName(const vector<Pipe>& pipes, string name) {
+vector <int> findPipesByName(const unordered_map<int, Pipe>& pipes, string name) {
 	vector <int> found;
-	for (const Pipe& pipe : pipes) {
-		if (pipe.name == name) {
-			found.push_back(pipe.id);
+	for (const auto& item : pipes) {
+		if (item.second.name == name) {
+			found.push_back(item.first);
 		}
 	}
 	return found;
 }
 
-vector <int> findPipesByState(const vector<Pipe>& pipes, bool state) {
+vector <int> findPipesByState(const unordered_map<int, Pipe>& pipes, bool state) {
 	vector <int> found;
-	for (const Pipe& pipe : pipes) {
-		if (pipe.statePipe == state) {
-			found.push_back(pipe.id);
+	for (const auto& item : pipes) {
+		if (item.second.statePipe == state) {
+			found.push_back(item.first);
 		}
 	}
 	return found;
 }
 
-void viewFoundPipes(const vector<Pipe>& pipes, const vector<int>& found) {
+void viewFoundPipes(const unordered_map<int, Pipe>& pipes, const vector<int>& found) {
 	if (found.empty()) {
 		cout << "no pipes found\n";
 		return;
 	}
 	for (int id : found) {
-		int index = findPipe(pipes, id);
-		if (index != -1) {
-			pipes[index].view();
+		auto it = pipes.find(id);
+		if (it != pipes.end()) {
+			it->second.view();
 		}
 	}
 }
@@ -148,30 +137,27 @@ vector<int> selectPipeIds(const vector<int>& found) {
 	return selected;
 }
 
-void editManyPipes(vector<Pipe>& pipes, const vector<int>& ids) {
+void editManyPipes(unordered_map<int, Pipe>& pipes, const vector<int>& ids) {
 	if (ids.empty()) return;
 	bool state = inputInt("new repair status (1-yes, 0-no): ", 0, 1);
 	for (int id : ids) {
-		int index = findPipe(pipes, id);
-		if (index != -1) {
-			pipes[index].statePipe = state;
+		auto it = pipes.find(id);
+		if (it != pipes.end()) {
+			it->second.statePipe = state;
 		}
 	}
 	cout << "pipes updated\n";
 }
 
-void deleteManyPipes(vector<Pipe>& pipes, const vector<int>& ids) {
+void deleteManyPipes(unordered_map<int, Pipe>& pipes, const vector<int>& ids) {
 	if (ids.empty()) return;
 	for (int id : ids) {
-		int index = findPipe(pipes, id);
-		if (index != -1) {
-			pipes.erase(pipes.begin() + index);
-		}
+		pipes.erase(id);
 	}
 	cout << "pipes deleted\n";
 }
 
-void batchPipeMenu(vector<Pipe>& pipes, const vector<int>& found) {
+void batchPipeMenu(unordered_map<int, Pipe>& pipes, const vector<int>& found) {
 	cout << "\n1. Edit all found\n";
 	cout << "2. Edit selected\n";
 	cout << "3. Delete all found\n";
@@ -187,7 +173,7 @@ void batchPipeMenu(vector<Pipe>& pipes, const vector<int>& found) {
 	else deleteManyPipes(pipes, selected);
 }
 
-void searchPipes(vector<Pipe>& pipes) {
+void searchPipes(unordered_map<int, Pipe>& pipes) {
 	if (pipes.empty()) {
 		cout << "no pipes added\n";
 		return;
@@ -204,13 +190,11 @@ void searchPipes(vector<Pipe>& pipes) {
 	if (!found.empty()) batchPipeMenu(pipes, found);
 }
 
-
-void pipeMenu(vector<Pipe>& pipes) {
+void pipeMenu(unordered_map<int, Pipe>& pipes) {
 	cout << "\n1. edit a pipe\n";
 	cout << "\n2. delete a pipe\n";
 	cout << "\n3. search pipes\n";
 	cout << "\n4. back\n";
-
 	int act = inputInt("please, choose: ", 0, 3);
 	if (act == 1) editSelectedPipe(pipes);
 	if (act == 2) deleteSelectedPipe(pipes);

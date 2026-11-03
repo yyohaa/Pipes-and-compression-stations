@@ -2,7 +2,7 @@
 //
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <unordered_map>
 #include "Pipe.h"
 #include "CS.h"
 #include "Input.h"
@@ -21,27 +21,23 @@ int main(int argc, char* argv[])
 
     if (argc > 1) {
         replayFile.open(argv[1]);
-
         if (!replayFile) {
             cout << "replay file not found\n";
             return 1;
         }
-
         oldCin = cin.rdbuf(replayFile.rdbuf());
     }
     else {
         logFile.open("session.log");
-
         if (!logFile) {
             cout << "log file error\n";
             return 1;
         }
-
         cerr_out.redirect(logFile);
     }
 
-    vector<Pipe> pipes;
-    vector<CS> stations;
+    unordered_map<int, Pipe> pipes;
+    unordered_map<int, CS> stations;
 
     int nextPipeId = 1;
     int nextCSId = 1;
